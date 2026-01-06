@@ -1,16 +1,56 @@
 #!/bin/sh
 
 # ------------------------------------------------------
-# check compiler is clang (and supported version (todo).
+# parse options (-n, --dry-run) or (-?, -h, --help) only
+# ------------------------------------------------------
+
+dry_run="no"
+my_basename=`basename $0`
+case "$1" in
+-h|--help)
+  echo "${my_basename} is a sh script to filter the internal commands of clang."
+  echo ""
+  echo "${my_basename} <clang> <opt1> <opt2> ..."
+  echo "    execute the final linking command after filtering the options by clang."
+  echo ""
+  echo "${my_basename} [-n|--dry-run] <clang> <opt1> <opt2> ..."
+  echo "    show the final linking command after filtering the options by clang."
+  echo ""
+  echo "${my_basename} [-?|-h|--help]"
+  echo "     print this help."
+  exit 0
+  ;;
+-n|--dry-run)
+  dry_run="yes"
+  shift
+  ;;
+-*)
+  echo "$1 is unknown option for ${my_basename}"
+  exit 1
+  ;;
+esac
+
+
+# ------------------------------------------------------
+# check compiler is clang (and supported version (todo))
 # ------------------------------------------------------
 compiler="$1"
-if ${compiler} --version | grep -qi clang
+if ! command -v "${compiler}" >/dev/null 2>&1
+then
+  echo "$1 is not an executable command" 1>&2
+  exit 2
+elif "${compiler}" --version 2>&1 | grep -qi clang
 then
   :
 else
-  echo "* This is not Clang, no filters applied" 1>&2
-  echo "$@"
-  exit 0
+  echo "* ${compiler} is non-Clang command, no filters applied" 1>&2
+  if test "x${dry_run}" = xyes
+  then
+    echo "$@"
+    exit 0
+  else
+    "$@"
+  fi
 fi
 shift
 
@@ -35,7 +75,7 @@ then
   log_stderr="${logdir}"/stderr.txt
 else
   echo "$0: requires 'mktemp' command." >&2
-  exit 1
+  exit 3
 fi
 
 # ------------------------------------------------------
@@ -65,5 +105,10 @@ do
       ;;
   esac
 done
-echo "${cmd_filtered}"
-exit 0
+if test "x${dry_run}" = xyes
+then
+  echo "${cmd_filtered}"
+  exit 0
+else
+  "${cmd_filtered}"
+fi
