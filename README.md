@@ -53,14 +53,15 @@ components automatically at runtime.
 
 However, certain versions of Apple Clang incorrectly
 attempt to link these component libraries directly,
-even when the user only specifies `-lSystem`. For example,
-Clang may expand this to `-lSystem -lsystem_pthread`,
-if it detects that some object files use pthread-related
-symbols.
+even when the user requests nothing. For example,
+Clang may expand append to `-lsystem_pthread -lSystem`,
+if the built library is designed to be placed under
+`/usr/lib/system`, like `-install_name /usr/lib/system/xxx.dylib`,
+even if the library has no dependency with PTHREAD.
 
 Unfortunately, `libsystem_pthread.dylib` is not shipped
-as a real dylib. Apple removed the actual dylibs and
-now provides only `.tbd` stubs, which cannot be linked
+as a real dylib any longer. Apple removed the actual dylibs
+and now provides only `.tbd` stubs, which cannot be linked
 directly.
 
 In practice, users should not link `-lsystem_xxx` manually.
