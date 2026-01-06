@@ -12,9 +12,13 @@ else
   echo "$@"
   exit 0
 fi
-
 shift
-"${compiler}" -### "$@" 2>clang-link.err 1>clang-link.out
+
+# ------------------------------------------------------
+# log commands constructed by clang
+# ------------------------------------------------------
+
+"${compiler}" -### "$@" 2>"${log_stderr}" 1>"${log_stdout}"
 status=$?
 
 if test ${status} -ne 0
