@@ -14,6 +14,30 @@ else
 fi
 shift
 
+if command -v mktemp >/dev/null 2>&1
+then
+  if test ! -z ${TMPDIR} -a -d ${TMPDIR} -a -w ${TMPDIR}
+  then
+    logdir=`mktemp -d ${TMPDIR}/clang-driver-filter.XXXXXX`
+    status=$?
+  else
+    logdir=`mktemp -d /tmp/clang-driver-filter.XXXXXX 2>/dev/null`
+    status=$?
+  fi
+
+  if test ${status} -ne 0 -o -z "${logdir}"
+  then
+    echo "$0: 'mktemp' does not support '-d' or failed to create a directory" >&2
+  fi
+
+  trap "rm -rf ${logdir}" EXIT
+  log_stdout="${logdir}"/stdout.txt
+  log_stderr="${logdir}"/stderr.txt
+else
+  echo "$0: requires 'mktemp' command." >&2
+  exit 1
+fi
+
 # ------------------------------------------------------
 # log commands constructed by clang
 # ------------------------------------------------------
@@ -23,13 +47,13 @@ status=$?
 
 if test ${status} -ne 0
 then
-  cat clang-link.out
-  cat clang-link.err >&2
+  cat "${log_stdout}"
+  cat "${log_stderr}" >&2
   exit $status
 fi
 
 cmd_filtered=
-for tok in `tail -1 < clang-link.err`
+for tok in `tail -1 < "${log_stderr}"`
 do
   case "${tok}" in
     \"-lsystem_*)
