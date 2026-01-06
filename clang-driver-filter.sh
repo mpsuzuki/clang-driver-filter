@@ -28,6 +28,9 @@ case "$1" in
   echo "$1 is unknown option for ${my_basename}"
   exit 1
   ;;
+*)
+  # proceed to compiler check
+  ;;
 esac
 
 
