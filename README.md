@@ -1,5 +1,5 @@
-# filter-clang-link.sh
-======================
+# clang-driver-filter.sh
+========================
 
 ## What is this?
 
@@ -90,17 +90,17 @@ libXXX.dylib: obj1.o obj2.o obj3.o
 
 To use this script, wrap the compiler invocation:
 ```
-LINK_WRAP ?= /path/to/filter-clang-link.sh
+LINK_WRAP ?= /path/to/clang-driver-filter.sh
 
 libXXX.dylib: obj1.o obj2.o obj3.o
 	$(LINK_WRAP) $(CC) $(CFLAGS) $(LDFLAGS) -dynamiclib -o $@ $^
 ```
 
-## Scope and limitations
+## Current scope and limitations
 
-This script is intended for the final linking stage only.
-It does not support cases where Clang performs multiple
-actions in a single invocation, such as:
+Currently, this script is intended for the final linking
+stage only. It does not support cases where Clang
+performs multiple actions in a single invocation, such as:
 
 ```
 hello: hello.c
@@ -108,6 +108,6 @@ hello: hello.c
 ```
 
 In such cases, `clang -###` prints multiple commands
-(compile, assemble, link). This script ignores all but the
-final command, so it cannot currently be used for this type
-of rule.
+(compile, assemble, link). Currently this script ignores
+all but the final command, so it cannot be used for this
+type of rule.
