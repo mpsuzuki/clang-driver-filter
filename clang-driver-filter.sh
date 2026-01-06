@@ -1,5 +1,8 @@
 #!/bin/sh
 
+# ------------------------------------------------------
+# check compiler is clang (and supported version (todo).
+# ------------------------------------------------------
 compiler="$1"
 if ${compiler} --version | grep -qi clang
 then
