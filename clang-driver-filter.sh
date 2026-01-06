@@ -100,7 +100,7 @@ for tok in `tail -1 < "${log_stderr}"`
 do
   case "${tok}" in
     \"-lsystem_*)
-      echo "*** ${tok} is excluded because it would not be linkable directly">2
+      echo "*** ${tok} is excluded because it would not be linkable directly" >&2
       ;;
     *)
       tok_deq=`echo "${tok}" | sed 's/^"//; s/"$//'`
